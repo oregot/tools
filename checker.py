@@ -7,7 +7,7 @@ import socket
 import requests
 import time
 import os
-
+import sys
 
 class bcolors:
     HEADER = '\033[95m'
@@ -19,8 +19,18 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+if len(sys.argv) == 1:
 
-JB_PUBLIC_HOST='192.168.200.57'
+    JB_PUBLIC_HOST='192.168.200.57'
+    JB_PUBLIC_HOST2='192.168.200.58'
+elif len(sys.argv) == 2:
+    JB_PUBLIC_HOST=sys.argv[1]
+    JB_PUBLIC_HOST2='192.168.200.58'
+else:
+    JB_PUBLIC_HOST=sys.argv[1]
+    JB_PUBLIC_HOST2=sys.argv[2]
+
+
 JB_HTTPS_PORT='4601'
 
 
@@ -28,7 +38,6 @@ url = "https://{0}:{1}".format(JB_PUBLIC_HOST,JB_HTTPS_PORT)
 
 
 
-JB_PUBLIC_HOST2='192.168.200.58'
 url2 = "https://{0}:{1}".format(JB_PUBLIC_HOST2,JB_HTTPS_PORT)
 
 

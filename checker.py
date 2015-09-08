@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-#import urllib2
 import urllib
-#import httplib
 import socket
 import requests
 import time
@@ -20,7 +18,6 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 if len(sys.argv) == 1:
-
     JB_PUBLIC_HOST='192.168.200.57'
     JB_PUBLIC_HOST2='192.168.200.58'
 elif len(sys.argv) == 2:
@@ -32,18 +29,13 @@ else:
 
 
 JB_HTTPS_PORT='4601'
-
-
+status1=0
+status2=0
 url = "https://{0}:{1}".format(JB_PUBLIC_HOST,JB_HTTPS_PORT)
-
-
-
 url2 = "https://{0}:{1}".format(JB_PUBLIC_HOST2,JB_HTTPS_PORT)
 
 
 def check_url(url):
-
-
     try:
         r = requests.get(url, verify=False)
     except:
@@ -51,13 +43,8 @@ def check_url(url):
     else:
         code=r.status_code
     return code
-#print check_url(url)
 
-status1=0
-status2=0
 while True:
-#    print(chr(27) + "[2J")
-#    os.system('clear')
     status_s1=check_url(url)
     status_s2=check_url(url2)
 
@@ -72,5 +59,4 @@ while True:
         print  time.strftime('%H:%M:%S') , bcolors.BOLD +url2 + bcolors.ENDC, bcolors.FAIL +  str(status_s2) + bcolors.ENDC
     status1=status_s1
     status2=status_s2
-#    print  time.strftime('%H:%M:%S') , bcolors.BOLD +url + bcolors.ENDC, check_url(url), "\t", url2, check_url(url2)
     time.sleep(1)

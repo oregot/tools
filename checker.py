@@ -6,6 +6,13 @@ import requests
 import time
 import os
 import sys
+import sqlite3
+
+conn = sqlite3.connect('checker.db')
+c = conn.cursor()
+
+c.execute("DROP TABLE IF EXISTS logs")
+c.execute("CREATE TABLE Logs(Id INT, Name TEXT, Status INT, TIMESTAMP)")
 
 class bcolors:
     HEADER = '\033[95m'
@@ -18,22 +25,11 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 if len(sys.argv) == 1:
-    JB_PUBLIC_HOST='192.168.200.57'
-    JB_PUBLIC_HOST2='192.168.200.58'
-elif len(sys.argv) == 2:
-    JB_PUBLIC_HOST=sys.argv[1]
-    JB_PUBLIC_HOST2='192.168.200.58'
-else:
-    JB_PUBLIC_HOST=sys.argv[1]
-    JB_PUBLIC_HOST2=sys.argv[2]
+    raise NameError('There are not any servers as parameters')
 
 
-JB_HTTPS_PORT='4601'
-status1=0
-status2=0
-url = "https://{0}:{1}".format(JB_PUBLIC_HOST,JB_HTTPS_PORT)
-url2 = "https://{0}:{1}".format(JB_PUBLIC_HOST2,JB_HTTPS_PORT)
-
+port='4601'
+status = 0
 
 def check_url(url):
     try:
@@ -44,19 +40,30 @@ def check_url(url):
         code=r.status_code
     return code
 
+statusd={}
+
+def check_host(status,server):
+    statusd[server] = status
+    if status == 200 and status != statusd[server]:
+        print  time.strftime('%H:%M:%S') , bcolors.BOLD +server + bcolors.ENDC, bcolors.OKGREEN +  str(status) + bcolors.ENDC
+#        c.execute("INSERT INTO logs values (?, ?, ?, ?)", (1, url, status, time.strftime('%H:%M:%S')))
+#        conn.commit()
+
+
+    elif status == str(404) and status !=  statusd[server]:
+        print  time.strftime('%H:%M:%S') , bcolors.BOLD +server + bcolors.ENDC, bcolors.FAIL +  str(status) + bcolors.ENDC
+    statusd[server] = status
+
 while True:
-    status_s1=check_url(url)
-    status_s2=check_url(url2)
-
-    if status_s1 == 200 and status_s1 != status1:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +url + bcolors.ENDC, bcolors.OKGREEN +  str(status_s1) + bcolors.ENDC
-    elif status_s1 == str(404) and status_s1 != status1:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +url + bcolors.ENDC, bcolors.FAIL +  str(status_s1) + bcolors.ENDC
-
-    if status_s2 == 200 and status_s2 != status2:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +url2 + bcolors.ENDC, bcolors.OKGREEN +  str(status_s2) + bcolors.ENDC
-    elif status_s2 == str(404) and status_s2 != status2:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +url2 + bcolors.ENDC, bcolors.FAIL +  str(status_s2) + bcolors.ENDC
-    status1=status_s1
-    status2=status_s2
+    for server in sys.argv[1:]:
+        url = "https://{0}:{1}".format(server,port)
+        status=check_url(url)
+        if server not in statusd.keys():
+            statusd[server] = 0
+        if status == 200 and status != statusd[server]:
+            print  time.strftime('%H:%M:%S') , bcolors.BOLD + url + bcolors.ENDC, bcolors.OKGREEN +  str(status) + bcolors.ENDC
+        elif status == str(404) and status !=  statusd[server]:
+            print  time.strftime('%H:%M:%S') , bcolors.BOLD + url + bcolors.ENDC, bcolors.FAIL +  str(status) + bcolors.ENDC
+        statusd[server] = status
     time.sleep(1)
+

@@ -42,17 +42,6 @@ def check_url(url):
 
 statusd={}
 
-def check_host(status,server):
-    statusd[server] = status
-    if status == 200 and status != statusd[server]:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +server + bcolors.ENDC, bcolors.OKGREEN +  str(status) + bcolors.ENDC
-#        c.execute("INSERT INTO logs values (?, ?, ?, ?)", (1, url, status, time.strftime('%H:%M:%S')))
-#        conn.commit()
-
-
-    elif status == str(404) and status !=  statusd[server]:
-        print  time.strftime('%H:%M:%S') , bcolors.BOLD +server + bcolors.ENDC, bcolors.FAIL +  str(status) + bcolors.ENDC
-    statusd[server] = status
 
 while True:
     for server in sys.argv[1:]:
@@ -62,8 +51,14 @@ while True:
             statusd[server] = 0
         if status == 200 and status != statusd[server]:
             print  time.strftime('%H:%M:%S') , bcolors.BOLD + url + bcolors.ENDC, bcolors.OKGREEN +  str(status) + bcolors.ENDC
-        elif status == str(404) and status !=  statusd[server]:
+            c.execute("INSERT INTO logs values (?, ?, ?, ?)", (1, url, status, time.strftime('%H:%M:%S')))
+            conn.commit()
+
+        elif status == 404 and status !=  statusd[server]:
             print  time.strftime('%H:%M:%S') , bcolors.BOLD + url + bcolors.ENDC, bcolors.FAIL +  str(status) + bcolors.ENDC
+            c.execute("INSERT INTO logs values (?, ?, ?, ?)", (1, url, status, time.strftime('%H:%M:%S')))
+            conn.commit()
+
         statusd[server] = status
     time.sleep(1)
 
